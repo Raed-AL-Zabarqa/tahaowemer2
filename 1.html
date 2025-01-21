@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>موقع مقالات البرمجة</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap">
+    <style>
+        /* تنسيق عام */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+
+        header {
+            background: #007bff;
+            padding: 20px;
+            color: #fff;
+            font-size: 24px;
+        }
+
+        nav {
+            margin-top: 10px;
+            background: #0056b3;
+            padding: 15px;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 15px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: #ffc107;
+        }
+
+        .container {
+            margin: 30px auto;
+            max-width: 800px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        input, textarea, button {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            background: #28a745;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        h1, h2 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <header>موقع مقالات البرمجة</header>
+
+    <nav>
+        <a href="#" onclick="showPage('home')">الرئيسية</a>
+        <a href="#" onclick="showPage('upload')">رفع مقال</a>
+        <a href="#" onclick="showPage('about')">من نحن</a>
+        <a href="#" onclick="showPage('login')" id="auth-link">تسجيل الدخول</a>
+    </nav>
+
+    <div id="home" class="container">
+        <h2>أحدث مقالات البرمجة</h2>
+        <div id="articles-list"></div>
+    </div>
+
+    <div id="upload" class="container hidden">
+        <h2>رفع مقال جديد</h2>
+        <form id="upload-form">
+            <input type="text" id="title" placeholder="عنوان المقال" required>
+            <textarea id="content" placeholder="محتوى المقال" required></textarea>
+            <button type="submit">نشر المقال</button>
+        </form>
+    </div>
+
+    <div id="about" class="container hidden">
+        <h2>من نحن</h2>
+        <p>هذا الموقع مخصص لمحبي البرمجة ويحتوي على مقالات تعليمية حول تطوير البرمجيات.</p>
+        <p>نغطي لغات البرمجة مثل: <strong>Python, JavaScript, HTML, CSS،</strong> والمزيد.</p>
+    </div>
+
+    <div id="login" class="container hidden">
+        <h2>تسجيل الدخول</h2>
+        <form id="login-form">
+            <input type="email" id="login-email" placeholder="البريد الإلكتروني" required>
+            <input type="password" id="login-password" placeholder="كلمة المرور" required>
+            <button type="submit">دخول</button>
+        </form>
+        <p>لا تملك حساب؟ <a href="#" onclick="showPage('register')">سجل الآن</a></p>
+    </div>
+
+    <div id="register" class="container hidden">
+        <h2>إنشاء حساب جديد</h2>
+        <form id="register-form">
+            <input type="text" id="username" placeholder="اسم المستخدم" required>
+            <input type="email" id="email" placeholder="البريد الإلكتروني" required>
+            <input type="password" id="password" placeholder="كلمة المرور" required>
+            <button type="submit">تسجيل</button>
+        </form>
+    </div>
+
+    <script>
+        function showPage(pageId) {
+            const pages = ['home', 'upload', 'about', 'login', 'register'];
+            pages.forEach(page => {
+                document.getElementById(page).classList.add('hidden');
+            });
+            document.getElementById(pageId).classList.remove('hidden');
+        }
+
+        // التحقق من تسجيل الدخول
+        document.addEventListener('DOMContentLoaded', function() {
+            const user = localStorage.getItem('loggedInUser');
+            const authLink = document.getElementById('auth-link');
+
+            if (user) {
+                authLink.innerText = "تسجيل الخروج";
+                authLink.href = "#";
+                authLink.onclick = function() {
+                    localStorage.removeItem('loggedInUser');
+                    alert("تم تسجيل الخروج!");
+                    showPage('login');
+                };
+            }
+        });
+
+        // تسجيل المستخدمين
+        document.getElementById('register-form')?.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            localStorage.setItem(email, JSON.stringify({ username, password }));
+            alert('تم التسجيل بنجاح!');
+            showPage('login');
+        });
+
+        // تسجيل الدخول
+        document.getElementById('login-form')?.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const user = JSON.parse(localStorage.getItem(email));
+
+            if (user && user.password === password) {
+                localStorage.setItem('loggedInUser', email);
+                alert('تم تسجيل الدخول بنجاح!');
+                showPage('upload');
+            } else {
+                alert('بيانات الدخول غير صحيحة!');
+            }
+        });
+
+        // رفع المقالات
+        document.getElementById('upload-form')?.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            articles.push({ title, content });
+            localStorage.setItem('articles', JSON.stringify(articles));
+
+            alert('تم رفع المقال بنجاح!');
+            showPage('home');
+            displayArticles();
+        });
+
+        // عرض المقالات
+        function displayArticles() {
+            const articlesList = document.getElementById('articles-list');
+            const articles = JSON.parse(localStorage.getItem('articles')) || [];
+            articlesList.innerHTML = articles.map(article => `
+                <article>
+                    <h3>${article.title}</h3>
+                    <p>${article.content}</p>
+                    <hr>
+                </article>
+            `).join('');
+        }
+
+        displayArticles();
+    </script>
+
+</body>
+</html>
